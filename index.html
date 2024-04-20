@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Availability Checker-Assignment</title>
+</head>
+<body>
+    
+    <h1><i><u>Doctor Availability Checker</u></i></h1>
+    <form id="availabilityForm">
+        <!--Labels-->
+        <label for="date"><i>Date:</i></label>
+        <input type="date" id="date" name="date"> 
+        <label for="time"><i>Time:</i></label>
+        <input type="time" id="time" name="time"> 
+        <button type="submit"><i>Check Availability</i></button>
+    </form>
+    <div id="availabilityResult"></div>
+    <script>
+        const form = document.getElementById('availabilityForm');
+        const resultDiv = document.getElementById('availabilityResult');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const date = formData.get('date');
+            const time = formData.get('time');
+
+            try {
+                const response = await fetch(`/doctor-availability?date=${date}&time=${time}`);
+                const data = await response.json();
+                displayAvailability(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+        
+        <!--Availability display-->
+        function displayAvailability(data) {
+            if (data.isAvailable) {
+                resultDiv.innerHTML = `<p>The doctor is available at the specified date and time.</p>`;
+            } else {
+                const nextSlot = data.nextAvailableSlot;
+                resultDiv.innerHTML = `<p>The doctor is not available at the specified date and time. Next available slot is on ${nextSlot.date} at ${nextSlot.time}.</p>`;
+            }
+        }
+    </script>
+
+</body>
+</html>
